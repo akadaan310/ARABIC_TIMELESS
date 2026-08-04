@@ -14,8 +14,9 @@ import { CORPUS, type CorpusEntry } from "@/lib/engine/corpus";
  * Arabic, and reporting what it preserved.
  */
 export function PassageReader({ initial }: { initial?: string }) {
-  const [entry, setEntry] = useState<CorpusEntry | null>(CORPUS[1]);
-  const [draft, setDraft] = useState(initial ?? CORPUS[1].text);
+  const seed = initial?.trim();
+  const [entry, setEntry] = useState<CorpusEntry | null>(seed ? null : CORPUS[1]);
+  const [draft, setDraft] = useState(seed || CORPUS[1].text);
   const [passage, setPassage] = useState<Passage | null>(null);
   const [lexicon, setLexicon] = useState<{ roots: number; lemmas: number; forms: number } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -47,7 +48,7 @@ export function PassageReader({ initial }: { initial?: string }) {
     }
   }, []);
 
-  useEffect(() => { load(draft, entry?.title); /* eslint-disable-next-line */ }, []);
+  useEffect(() => { load(draft, entry?.title ?? undefined); /* eslint-disable-next-line */ }, []);
 
   const op: Operation | null = opId ? OP_BY_ID[opId] ?? null : null;
   const result: OpResult | null = useMemo(

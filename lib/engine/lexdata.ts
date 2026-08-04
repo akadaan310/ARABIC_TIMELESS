@@ -47,6 +47,22 @@ export const getLemma = (l: string): LemmaEntry | undefined => LEMMAS[l];
 
 export const allRoots = (): string[] => Object.keys(ROOTS);
 
+let BY_ROOT: Map<string, LemmaEntry[]> | null = null;
+
+/** Every lemma recorded under a root, with its glosses. */
+export function lemmasOfRoot(root: string): LemmaEntry[] {
+  if (!BY_ROOT) {
+    BY_ROOT = new Map();
+    for (const e of Object.values(LEMMAS)) {
+      if (!e.r) continue;
+      const a = BY_ROOT.get(e.r);
+      if (a) a.push(e);
+      else BY_ROOT.set(e.r, [e]);
+    }
+  }
+  return BY_ROOT.get(root) ?? [];
+}
+
 // ---------------------------------------------------------------------------
 // Lookup
 // ---------------------------------------------------------------------------

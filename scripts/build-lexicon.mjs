@@ -201,7 +201,7 @@ for (const [key, tok] of tokens) {
 }
 
 // keep the most frequent glosses per entry, cleaned
-const topGlosses = (m, n = 6) =>
+const topGlosses = (m, n = 14) =>
   [...m.entries()]
     .sort((a, b) => b[1] - a[1])
     .map(([g]) => g.replace(/^\(|\)$/g, "").trim())
@@ -213,14 +213,14 @@ for (const [k, v] of roots) {
   rootsOut[k] = {
     d: v.display,
     n: v.count,
-    g: topGlosses(v.glosses),
+    g: topGlosses(v.glosses, 14),
     l: [...v.lemmas].slice(0, 12),
   };
 }
 
 const lemmasOut = {};
 for (const [k, v] of lemmas) {
-  lemmasOut[k] = { d: v.display, r: v.root ?? null, n: v.count, g: topGlosses(v.glosses, 4), p: v.pos };
+  lemmasOut[k] = { d: v.display, r: v.root ?? null, n: v.count, g: topGlosses(v.glosses, 6), p: v.pos };
 }
 
 const surfaceOut = {};

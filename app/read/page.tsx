@@ -2,7 +2,12 @@ import { PassageReader } from "@/components/PassageReader";
 
 export const metadata = { title: "Read — passages through the operations" };
 
-export default function ReadPage() {
+export default async function ReadPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ text?: string }>;
+}) {
+  const { text } = await searchParams;
   return (
     <div className="space-y-5">
       <header className="max-w-2xl">
@@ -22,7 +27,7 @@ export default function ReadPage() {
           its effect. Tap any word to open it.
         </p>
       </header>
-      <PassageReader />
+      <PassageReader initial={text} />
     </div>
   );
 }

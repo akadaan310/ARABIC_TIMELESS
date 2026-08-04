@@ -25,6 +25,7 @@ export const viewport: Viewport = {
 const NAV = [
   { href: "/", label: "Open sesame", ar: "إفتح" },
   { href: "/read", label: "Read", ar: "القراءة" },
+  { href: "/compose", label: "Compose", ar: "التأليف" },
   { href: "/live", label: "Live", ar: "الحوار" },
   { href: "/workspace", label: "Workspace", ar: "المشغل" },
   { href: "/alphabet", label: "Alphabet", ar: "الحروف" },
