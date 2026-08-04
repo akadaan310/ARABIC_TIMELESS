@@ -42,29 +42,48 @@ substitution changes letters and leaves the written skeleton **identical**.
 > A substitution that cannot be seen is a real object in this language.
 
 The skeleton-preserving substitutions form a subgroup — the **silent subgroup**.
-It is the direct product of the symmetric groups on each shape class:
+It is the direct product of the symmetric groups on each class.
+
+### Silence is position-dependent
+
+The classes are not the same in every position, so neither is silence. Layer 0
+records that ن and ي leave the tooth in final and isolated position, taking the
+forms ں and ى. A substitution swapping ب↔ن is therefore **silent in the middle
+of a word and visible at its end**:
 
 ```
-S₅ × S₃ × (S₂)⁷ × (S₁)⁶
+كتب → كٮٮ          كتن → كٮں
 ```
 
-one factor per class from Layer 0: the five-letter tooth class, the three-letter
-ح class, seven two-letter classes, and six singletons.
+Two subgroups follow, and they are different sizes.
 
-Its order:
+**Silent in medial position** — built on the medial classes, one factor for the
+five-letter tooth, one for the three-letter ح class, seven two-letter classes,
+and six singletons:
 
 ```
-5! · 3! · (2!)⁷ = 120 · 6 · 128 = 92,160
+S₅ × S₃ × (S₂)⁷ × (S₁)⁶        5! · 3! · (2!)⁷ = 92,160
 ```
 
-**92,160 substitutions rewrite every text in the language and leave every page
-looking exactly as it did.**
+**Silent in every position** — built on the common refinement of the medial and
+final classes, in which the tooth is only {ب ت ث} and ن and ي stand alone:
 
-> **A distinction worth stating.** 92,160 is the number of skeleton-preserving
-> *bijections* of the alphabet. It is not the same as 1,920 — the product of the
-> class sizes — which counts the ways to choose one letter from each class. The
-> first is a group order; the second is a selection count. They answer different
-> questions and only the first is the size of the subgroup.
+```
+S₃ × S₃ × (S₂)⁷ × (S₁)⁸        3! · 3! · (2!)⁷ = 4,608
+```
+
+> **4,608 substitutions rewrite every text in the language and leave every page
+> looking exactly as it did, wherever the letters fall.**
+
+The larger figure is real but weaker: it counts substitutions that survive a
+medial position and may betray themselves at a word's end. Only the smaller
+subgroup is unconditionally invisible, and it is the one the skeleton is the
+invariant of.
+
+> **A distinction worth stating.** Both figures are group orders. Neither is
+> 1,920 — the product of the medial class sizes — which counts the ways to
+> choose one letter from each class. That is a selection count, not a group
+> order, and it answers a different question.
 
 ### Why this matters
 
@@ -99,7 +118,8 @@ involution.
 
 Now apply a class-swap that sends **ت → ب** and leaves everything else fixed.
 The string كتب becomes كبب. On the surface, **nothing has changed** — both are
-written كٮٮ. A reader consulting the page cannot detect that the substitution
+written كٮٮ, and ب and ت share a class in every position, so the swap is silent
+wherever it lands. A reader consulting the page cannot detect that the substitution
 occurred. A reader consulting the *candidate set* cannot either, because both
 words were always in it.
 
@@ -116,7 +136,7 @@ invariant of the silent subgroup.
 | 2 | Closure | **Pass.** Substitutions map strings over the alphabet to strings over the alphabet, and compose within the group. |
 | 3 | Independence | **Pass.** Layer 3 gives the alphabet an order and defines step and reflect on single letters. It does not close them into a group, does not compose them, and has no notion of a transformation acting on a *string*. |
 | 4 | Accounted loss | **Pass.** Every substitution is a bijection and therefore exactly invertible. There is no loss anywhere in this layer. |
-| 5 | Hand-verifiability | **Pass.** The order 92,160 is a product of six small factorials. The silence test is twenty-eight comparisons. |
+| 5 | Hand-verifiability | **Pass.** Both orders are products of small factorials. The silence test is twenty-eight comparisons, made once per position. |
 
 ---
 

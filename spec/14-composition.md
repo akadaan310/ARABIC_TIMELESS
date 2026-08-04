@@ -29,9 +29,11 @@ the observable survives the transformation.
 
 Read the table by its columns and the architecture's shape appears.
 
-**Silent substitution** — the skeleton-preserving subgroup of Layer 8 — leaves the
-skeleton and the profile untouched and destroys weight and multiset. It is
-invisible to the eye and loud to arithmetic.
+**Silent substitution** — the skeleton-preserving subgroup of Layer 8, taken in
+its unconditional form — leaves the skeleton and the profile untouched and
+destroys weight and multiset. It is invisible to the eye and loud to arithmetic.
+(The row holds for the subgroup that is silent in *every* position, order 4,608.
+The larger medial-only subgroup does not preserve the skeleton at a word's end.)
 
 **Permutation** does the reverse exactly. It leaves weight and multiset untouched
 and destroys skeleton and profile. It is invisible to arithmetic and loud to the

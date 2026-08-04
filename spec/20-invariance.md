@@ -62,7 +62,8 @@ needs to be kept anywhere.
 | Order of the abjadī↔hijāʾī permutation | **105** | 3 | lcm of the cycle lengths 1, 1, 5, 21 |
 | Letters fixed by that permutation | **ا, ب** | 3 | tabulate and compare |
 | Fixed points of reflection | **none** | 3 | 28 is even |
-| Order of the silent subgroup | **92,160** | 8 | 5! · 3! · (2!)⁷ |
+| Order of the silent subgroup, all positions | **4,608** | 8 | 3! · 3! · (2!)⁷ |
+| Order of the silent subgroup, medial only | **92,160** | 8 | 5! · 3! · (2!)⁷ |
 | Rotation orbits of the eight feet | **3** | 11 | rotate each binary word |
 | Triliteral root orbits | 3,276 | 9 | 28 · 27 · 26 ÷ 6 |
 | Quinqueliteral root orbits | 98,280 | 9 | 28 · 27 · 26 · 25 · 24 ÷ 120 |
