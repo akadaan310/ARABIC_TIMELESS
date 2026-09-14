@@ -3,8 +3,13 @@
  * runner for each one, and returns a fully structured, inspectable result.
  * Nothing is hidden behind a generic "success" message: every step's input,
  * output (or error), and timing is retained.
+ *
+ * This is the ONE executor for every Engine — curated or composed. A
+ * composed Engine's steps carry declarative `bindings` (see ports.ts)
+ * exactly like a curated one; there is no second execution path.
  */
 import { makeProvenance } from "../../../../packages/provenance/index";
+import { resolveStepInput } from "./ports";
 import { CAPABILITY_RUNNERS } from "./engines";
 import { ENGINE_VERSION, CORPUS_VERSION } from "./capabilities";
 import type { EngineDefinition, ExecutionResult, StepResult } from "./types";
@@ -27,7 +32,7 @@ export function executeEngine(
     const ctx = { rawInput: input, configuration, outputs };
     let stepInput: unknown;
     try {
-      stepInput = step.buildInput(ctx);
+      stepInput = resolveStepInput(step.capabilityId, step.bindings, ctx);
       const runner = CAPABILITY_RUNNERS[step.capabilityId];
       if (!runner) throw new Error(`no runner registered for capability "${step.capabilityId}"`);
       const output = runner(stepInput);

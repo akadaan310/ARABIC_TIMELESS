@@ -5,38 +5,39 @@
  * are defined here rather than forced into an SDK package. Everything they
  * carry that the SDK *does* have a type for (Provenance, Relation,
  * Discovery, Structure, BasisEvaluation, Traversal) reuses that type
- * directly — see sdk/capabilities.ts.
+ * directly — see sdk/capabilities.ts. Port/binding/compatibility types live
+ * in sdk/ports.ts, the composition contract layer this milestone adds.
  */
 import type { Provenance } from "../../../../packages/provenance/index";
+import type { PortBinding } from "./ports";
 
 export type EngineStatus = "experimental" | "runnable" | "challenged" | "validated";
 
-export interface ConfigField {
-  readonly key: string;
-  readonly label: string;
-  readonly type: "number" | "string";
-  readonly default: number | string;
-}
-
 export interface EngineStep {
   readonly capabilityId: string;
-  /** Explicit, hand-written adapter from the running context to this
-   * capability's input — never a structural/implicit cast. This is the same
-   * discipline @engine/corpus's ProjectionRule enforces for locus
-   * granularity, applied here to capability composition. */
-  buildInput(ctx: EngineContext): unknown;
+  /** data-port key -> where its value comes from. Only data ports need a
+   * binding; config ports are always resolved from configuration/defaults
+   * at execution time (see ports.ts resolveStepInput). Never a structural/
+   * implicit cast — this is the same discipline @engine/corpus's
+   * ProjectionRule enforces for locus granularity, applied here to
+   * capability composition. */
+  readonly bindings: Readonly<Record<string, PortBinding>>;
 }
 
 export interface EngineDefinition {
   readonly id: string;
   readonly name: string;
   readonly version: string;
+  /** groups versions of "the same" named Engine — see Step 7 (versioning) */
+  readonly family: string;
+  readonly origin: "curated" | "composed";
   readonly description: string;
   readonly steps: readonly EngineStep[];
-  readonly configFields: readonly ConfigField[];
-  /** what raw input this Engine expects, and a working default so it is
-   * runnable the moment EngineLab opens */
+  /** what raw input this Engine expects — canonically `{ nodes: LabNode[] }`
+   * for every Engine in this milestone, so it is runnable the moment
+   * EngineLab opens with no server and no corpus file required */
   readonly defaultInput: unknown;
+  readonly createdAt: string;
 }
 
 export interface EngineContext {
@@ -74,9 +75,11 @@ export interface ChallengeDefinition {
   readonly label: string;
   readonly category: "invariance" | "reproducibility" | "comparison" | "parameter-sensitivity";
   readonly description: string;
-  /** which Engine ids this challenge is meaningful against; a challenge is
-   * never offered for an Engine it cannot actually evaluate */
-  readonly appliesTo: (engineId: string) => boolean;
+  /** Whether this challenge is meaningful against a given RESULT — based on
+   * which capabilities actually ran, never on a hardcoded engine id, so a
+   * composed Engine gets exactly the same challenges a curated one with the
+   * same capabilities would (Step 8). */
+  readonly appliesTo: (result: ExecutionResult) => boolean;
   run(result: ExecutionResult): ChallengeOutcome;
 }
 

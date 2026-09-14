@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { LabState } from "../state/useLab";
 import { Json } from "./Json";
+import { compareExecutions } from "../sdk/compare";
 import type { ExecutionResult } from "../sdk/types";
 
 function stepsSignature(r: ExecutionResult) {
@@ -14,6 +15,7 @@ export function ExperimentsView({ lab }: { lab: LabState }) {
 
   const selected = experiments.find((e) => e.id === selectedExperimentId);
   const compareWith = experiments.find((e) => e.id === compareId);
+  const comparison = selected && compareWith ? compareExecutions(selected, compareWith) : undefined;
 
   return (
     <div>
@@ -66,39 +68,63 @@ export function ExperimentsView({ lab }: { lab: LabState }) {
             </div>
           )}
 
-          {compareWith && (
+          {comparison && (
             <div style={{ marginTop: 12 }}>
-              <h2>Comparison with {compareWith.id}</h2>
-              {selected.engineId !== compareWith.engineId ? (
-                <p className="tag">Different engines ({selected.engineId} vs {compareWith.engineId}) — comparing at the whole-result level only.</p>
-              ) : null}
-              {(() => {
-                const a = stepsSignature(selected.result);
-                const b = stepsSignature(compareWith.result);
-                const length = Math.max(a.length, b.length);
-                return (
+              <h2>Comparison with {compareWith!.id}</h2>
+              {!comparison.sameEngine && (
+                <p className="tag">Different engines ({comparison.engineA.id} v{comparison.engineA.version} vs {comparison.engineB.id} v{comparison.engineB.version}).</p>
+              )}
+              <div className="grid">
+                <div>
+                  <label>configuration — {selected.id}</label>
+                  <Json value={comparison.configurationA} maxLen={500} />
+                </div>
+                <div>
+                  <label>configuration — {compareWith!.id}</label>
+                  <Json value={comparison.configurationB} maxLen={500} />
+                </div>
+              </div>
+
+              <label style={{ marginTop: 10 }}>steps</label>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+                <thead>
+                  <tr style={{ color: "var(--ink-3)", textAlign: "left" }}>
+                    <th>#</th><th>{selected.id}</th><th>{compareWith!.id}</th><th>—</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {comparison.steps.map((row) => (
+                    <tr key={row.index} style={{ borderTop: "1px solid var(--line)" }}>
+                      <td>{row.index + 1}</td>
+                      <td>{row.capabilityA ?? "—"}</td>
+                      <td>{row.capabilityB ?? "—"}</td>
+                      <td><span className={`pill ${row.same ? "pass" : "fail"}`}>{row.same ? "MATCH" : "DIFFERS"}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {comparison.challenges.length > 0 && (
+                <>
+                  <label style={{ marginTop: 10 }}>challenges</label>
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
                     <thead>
                       <tr style={{ color: "var(--ink-3)", textAlign: "left" }}>
-                        <th>#</th><th>{selected.id}</th><th>{compareWith.id}</th><th>—</th>
+                        <th>challenge</th><th>{selected.id}</th><th>{compareWith!.id}</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {Array.from({ length }, (_, i) => {
-                        const same = JSON.stringify(a[i]) === JSON.stringify(b[i]);
-                        return (
-                          <tr key={i} style={{ borderTop: "1px solid var(--line)" }}>
-                            <td>{i + 1}</td>
-                            <td>{a[i]?.capabilityId ?? "—"}</td>
-                            <td>{b[i]?.capabilityId ?? "—"}</td>
-                            <td><span className={`pill ${same ? "pass" : "fail"}`}>{same ? "MATCH" : "DIFFERS"}</span></td>
-                          </tr>
-                        );
-                      })}
+                      {comparison.challenges.map((row) => (
+                        <tr key={row.challengeId} style={{ borderTop: "1px solid var(--line)" }}>
+                          <td>{row.challengeId}</td>
+                          <td>{row.verdictA ? <span className={`pill ${row.verdictA.toLowerCase()}`}>{row.verdictA}</span> : "—"}</td>
+                          <td>{row.verdictB ? <span className={`pill ${row.verdictB.toLowerCase()}`}>{row.verdictB}</span> : "—"}</td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
-                );
-              })()}
+                </>
+              )}
             </div>
           )}
         </div>

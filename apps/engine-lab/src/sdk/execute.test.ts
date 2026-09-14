@@ -23,14 +23,14 @@ describe("executeEngine", () => {
 
   it("runs the single-capability invertibility-probe engine", () => {
     const engine = getEngine("invertibility-probe")!;
-    const result = executeEngine(engine, engine.defaultInput, { transformId: "reverse" });
+    const result = executeEngine(engine, engine.defaultInput, { "arabic.verifyTransform.transformId": "reverse" });
     expect(result.status).toBe("success");
     expect(result.steps).toHaveLength(1);
   });
 
   it("stops at the first failing step and reports a structured error, never a silent success", () => {
     const engine = getEngine("canonical-chain")!;
-    const badConfig = { seedLocusKey: "no:such:locus" };
+    const badConfig = { "traversal.walk.seedLocusKey": "no:such:locus" };
     const result = executeEngine(engine, engine.defaultInput, badConfig);
     expect(result.status).toBe("error");
     expect(result.error).toMatch(/traversal\.walk/);
@@ -43,8 +43,8 @@ describe("executeEngine", () => {
 
   it("is deterministic given identical input and configuration", () => {
     const engine = getEngine("canonical-chain")!;
-    const a = executeEngine(engine, engine.defaultInput, { seed: 7, sampleSize: 500 });
-    const b = executeEngine(engine, engine.defaultInput, { seed: 7, sampleSize: 500 });
+    const a = executeEngine(engine, engine.defaultInput, { "spatial.evaluateBasis.seed": 7, "spatial.evaluateBasis.sampleSize": 500 });
+    const b = executeEngine(engine, engine.defaultInput, { "spatial.evaluateBasis.seed": 7, "spatial.evaluateBasis.sampleSize": 500 });
     const strip = (r: typeof a) => r.steps.map((s) => ({ capabilityId: s.capabilityId, output: s.output, error: s.error }));
     expect(strip(a)).toEqual(strip(b));
   });

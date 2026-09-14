@@ -22,12 +22,16 @@ function outcome(challengeId: string, verdict: ChallengeOutcome["verdict"], summ
   return { challengeId, verdict, summary, evidence, evaluatedAt: new Date().toISOString() };
 }
 
+function ran(result: ExecutionResult, capabilityId: string): boolean {
+  return result.steps.some((s) => s.capabilityId === capabilityId && !s.error);
+}
+
 const invertibilityVerdict: ChallengeDefinition = {
   id: "invertibility-verdict",
   label: "Invertibility verdict",
   category: "invariance",
   description: "Reads the InvertibilityReport a run already produced and turns its verdict into a challenge outcome.",
-  appliesTo: (engineId) => engineId === "invertibility-probe",
+  appliesTo: (result) => ran(result, "arabic.verifyTransform"),
   run: (result) => {
     const report = stepOutput<InvertibilityReport<string>>(result, "arabic.verifyTransform");
     if (!report) return outcome("invertibility-verdict", "INCONCLUSIVE", "no InvertibilityReport in this result", null);
@@ -45,7 +49,7 @@ const basisLocality: ChallengeDefinition = {
   label: "Basis locality vs. null model",
   category: "comparison",
   description: "Compares the run's BasisEvaluation.locality against the null-model baseline of 1 (blind to structure).",
-  appliesTo: (engineId) => engineId === "canonical-chain",
+  appliesTo: (result) => ran(result, "spatial.evaluateBasis"),
   run: (result) => {
     const evaluation = stepOutput<BasisEvaluation>(result, "spatial.evaluateBasis");
     if (!evaluation || evaluation.nullModelSampleSize === 0) {
@@ -66,7 +70,7 @@ const discoveryBoundSensitivity: ChallengeDefinition = {
   label: "Discovery bound-relative demotion",
   category: "parameter-sensitivity",
   description: "Tightens the discovery bound signature and checks that EXHAUSTED claims correctly demote to KNOWN, per packages/discovery's core invariant.",
-  appliesTo: (engineId) => engineId === "canonical-chain",
+  appliesTo: (result) => ran(result, "discovery.wrap"),
   run: (result) => {
     const discoveryOutput = stepOutput<{ discoveries: readonly Discovery<Relation>[] }>(result, "discovery.wrap");
     if (!discoveryOutput || discoveryOutput.discoveries.length === 0) {
@@ -120,8 +124,8 @@ export function listChallenges(): readonly ChallengeDefinition[] {
   return CHALLENGES;
 }
 
-export function challengesFor(engineId: string): readonly ChallengeDefinition[] {
-  return CHALLENGES.filter((c) => c.appliesTo(engineId));
+export function challengesFor(result: ExecutionResult): readonly ChallengeDefinition[] {
+  return CHALLENGES.filter((c) => c.appliesTo(result));
 }
 
 export function runChallenge(challengeId: string, result: ExecutionResult): ChallengeOutcome {

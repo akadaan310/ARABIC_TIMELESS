@@ -2,12 +2,13 @@ import { useState } from "react";
 import { useLab } from "./state/useLab";
 import { CapabilitiesView } from "./components/CapabilitiesView";
 import { EnginesView } from "./components/EnginesView";
+import { ComposerView } from "./components/ComposerView";
 import { ResultView } from "./components/ResultView";
 import { ChallengesView } from "./components/ChallengesView";
 import { ExperimentsView } from "./components/ExperimentsView";
 import { DiscoveryView } from "./components/DiscoveryView";
 
-const TABS = ["Capabilities", "Engines", "Results", "Challenges", "Experiments", "Discovery"] as const;
+const TABS = ["Capabilities", "Composer", "Engines", "Results", "Challenges", "Experiments", "Discovery"] as const;
 type Tab = (typeof TABS)[number];
 
 export default function App() {
@@ -32,6 +33,7 @@ export default function App() {
       </nav>
       <main className="main">
         {tab === "Capabilities" && <CapabilitiesView capabilities={lab.capabilities} />}
+        {tab === "Composer" && <ComposerView lab={lab} />}
         {tab === "Engines" && <EnginesView lab={lab} />}
         {tab === "Results" && <ResultView lab={lab} />}
         {tab === "Challenges" && <ChallengesView lab={lab} />}

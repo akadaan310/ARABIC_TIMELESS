@@ -1,33 +1,40 @@
 import { useCallback, useMemo, useState } from "react";
-import { listEngines, getEngine } from "../sdk/engines";
+import { listEngines, getEngine, saveCustomEngine } from "../sdk/engines";
 import { executeEngine } from "../sdk/execute";
 import { challengesFor, runChallenge } from "../sdk/challenges";
 import { createExperimentStore } from "../sdk/store";
 import { deriveEngineStatus } from "../sdk/status";
-import { discoverEngineCandidates } from "../sdk/discovery";
+import { discoverEngineCandidates, analyzeCompositions } from "../sdk/discovery";
 import { listCapabilities } from "../sdk/capabilities";
+import { deriveConfigFields } from "../sdk/ports";
+import {
+  emptyDraft, compatibilityFor, addStep as composerAddStep, removeLastStep, canSwap, swapSteps,
+  type ComposerDraft,
+} from "../sdk/composer";
+import type { PortBinding } from "../sdk/ports";
 import type { ChallengeOutcome, ExecutionResult, Experiment } from "../sdk/types";
 
 const store = createExperimentStore();
 
 export function useLab() {
-  const engines = listEngines();
+  const [engineVersion, setEngineVersion] = useState(0); // bump to re-read listEngines() after a save
+  const engines = useMemo(() => listEngines(), [engineVersion]);
   const capabilities = listCapabilities();
   const [selectedEngineId, setSelectedEngineId] = useState(engines[0]?.id ?? "");
+  const selectedEngine = getEngine(selectedEngineId) ?? engines[0];
+
   const [configuration, setConfiguration] = useState<Record<string, unknown>>(() =>
-    Object.fromEntries((getEngine(engines[0]?.id ?? "")?.configFields ?? []).map((f) => [f.key, f.default])),
+    Object.fromEntries(deriveConfigFields(selectedEngine?.steps ?? []).map((f) => [f.key, f.default])),
   );
   const [lastResult, setLastResult] = useState<ExecutionResult | undefined>();
   const [lastChallenges, setLastChallenges] = useState<readonly ChallengeOutcome[]>([]);
   const [experiments, setExperiments] = useState<readonly Experiment[]>(() => store.list());
   const [selectedExperimentId, setSelectedExperimentId] = useState<string | undefined>();
 
-  const selectedEngine = getEngine(selectedEngineId);
-
   const selectEngine = useCallback((id: string) => {
     setSelectedEngineId(id);
     const engine = getEngine(id);
-    setConfiguration(Object.fromEntries((engine?.configFields ?? []).map((f) => [f.key, f.default])));
+    setConfiguration(Object.fromEntries(deriveConfigFields(engine?.steps ?? []).map((f) => [f.key, f.default])));
     setLastResult(undefined);
     setLastChallenges([]);
   }, []);
@@ -79,17 +86,51 @@ export function useLab() {
   );
 
   const candidates = useMemo(() => discoverEngineCandidates(experiments), [experiments]);
+  const compositions = useMemo(() => analyzeCompositions(engines, experiments), [engines, experiments]);
+
+  // --- Composer (Step 4) ---------------------------------------------------
+  const [draft, setDraft] = useState<ComposerDraft>(emptyDraft());
+  const [engineName, setEngineName] = useState("");
+
+  const addCapability = useCallback((capabilityId: string, overrides?: Readonly<Record<string, PortBinding>>) => {
+    const outcome = composerAddStep(draft, capabilityId, overrides);
+    if (outcome.added) setDraft(outcome.draft);
+    return outcome;
+  }, [draft]);
+
+  const removeLast = useCallback(() => setDraft((d) => removeLastStep(d)), []);
+  const moveStepUp = useCallback((index: number) => setDraft((d) => (canSwap(d, index) ? swapSteps(d, index) : d)), []);
+  const resetDraft = useCallback(() => { setDraft(emptyDraft()); setEngineName(""); }, []);
+
+  const saveDraftAsEngine = useCallback((family?: string) => {
+    if (draft.steps.length === 0 || !engineName.trim()) return undefined;
+    const saved = saveCustomEngine({
+      name: engineName.trim(),
+      description: `Composed from ${draft.steps.map((s) => s.capabilityId).join(" → ")}.`,
+      steps: draft.steps,
+      defaultInput: { nodes: (getEngine("canonical-chain")?.defaultInput as { nodes: unknown })?.nodes },
+      family,
+    });
+    setEngineVersion((v) => v + 1);
+    resetDraft();
+    selectEngine(saved.id);
+    return saved;
+  }, [draft, engineName, resetDraft, selectEngine]);
 
   return {
     engines, capabilities, engineStatuses,
     selectedEngine, selectedEngineId, selectEngine,
     configuration, setConfigField,
     lastResult, lastChallenges, execute, challenge,
-    applicableChallenges: selectedEngine ? challengesFor(selectedEngine.id) : [],
+    applicableChallenges: lastResult ? challengesFor(lastResult) : [],
     recordExperiment,
     experiments, selectedExperimentId, setSelectedExperimentId,
     replayExperiment,
-    candidates,
+    candidates, compositions,
+    // composer
+    draft, compatibilityFor: (capabilityId: string) => compatibilityFor(draft, capabilityId),
+    addCapability, removeLast, moveStepUp, canSwap: (index: number) => canSwap(draft, index),
+    engineName, setEngineName, saveDraftAsEngine, resetDraft,
   };
 }
 

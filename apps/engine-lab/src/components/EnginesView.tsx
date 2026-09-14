@@ -1,4 +1,5 @@
 import type { LabState } from "../state/useLab";
+import { deriveConfigFields } from "../sdk/ports";
 import { Json } from "./Json";
 
 export function EnginesView({ lab }: { lab: LabState }) {
@@ -7,7 +8,10 @@ export function EnginesView({ lab }: { lab: LabState }) {
   return (
     <div>
       <h1>Engines</h1>
-      <p className="subtitle">An Engine is a composition of capabilities with configuration. Select one, configure it, execute it.</p>
+      <p className="subtitle">
+        An Engine is a composition of capabilities with configuration. Select one, configure it, execute it —
+        or build a new one on the Composer tab.
+      </p>
 
       {engines.map((e) => (
         <div
@@ -16,7 +20,10 @@ export function EnginesView({ lab }: { lab: LabState }) {
           onClick={() => selectEngine(e.id)}
         >
           <div>
-            <div className="name">{e.name} <span className="tag">v{e.version}</span></div>
+            <div className="name">
+              {e.name} <span className="tag">v{e.version}</span>{" "}
+              <span className="tag">{e.origin === "composed" ? "composed" : "curated"}</span>
+            </div>
             <div className="meta">{e.steps.map((s) => s.capabilityId).join(" → ")}</div>
           </div>
           <span className={`pill ${engineStatuses[e.id]}`}>{engineStatuses[e.id]}</span>
@@ -35,21 +42,24 @@ export function EnginesView({ lab }: { lab: LabState }) {
             ))}
           </div>
 
-          {selectedEngine.configFields.length > 0 && (
-            <>
-              <h2>Configuration</h2>
-              {selectedEngine.configFields.map((f) => (
-                <div className="field" key={f.key}>
-                  <label>{f.label}</label>
-                  <input
-                    type={f.type === "number" ? "number" : "text"}
-                    value={String(configuration[f.key] ?? f.default)}
-                    onChange={(ev) => setConfigField(f.key, f.type === "number" ? Number(ev.target.value) : ev.target.value)}
-                  />
-                </div>
-              ))}
-            </>
-          )}
+          {(() => {
+            const configFields = deriveConfigFields(selectedEngine.steps);
+            return configFields.length > 0 && (
+              <>
+                <h2>Configuration</h2>
+                {configFields.map((f) => (
+                  <div className="field" key={f.key}>
+                    <label>{f.label}</label>
+                    <input
+                      type={f.type === "number" ? "number" : "text"}
+                      value={String(configuration[f.key] ?? f.default)}
+                      onChange={(ev) => setConfigField(f.key, f.type === "number" ? Number(ev.target.value) : ev.target.value)}
+                    />
+                  </div>
+                ))}
+              </>
+            );
+          })()}
 
           <h2>Input</h2>
           <p className="tag">Fixed small synthetic dataset for this milestone — see Input below.</p>

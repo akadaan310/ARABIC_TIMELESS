@@ -183,17 +183,21 @@ registerCapability({
 
 export interface DiscoveryWrapInput {
   readonly relations: readonly Relation<{ skeleton: string }>[];
-  readonly bounds: Readonly<Record<string, number>>;
+  /** node count the relation scan was exhaustive over — a plain number so
+   * this capability composes on a single scalar config port; wrapped into a
+   * real BoundSignature internally. */
+  readonly boundsNodeCount: number;
 }
 export interface DiscoveryWrapOutput { readonly discoveries: readonly Discovery<Relation>[] }
 
 export function runDiscoveryWrap(input: DiscoveryWrapInput): DiscoveryWrapOutput {
+  const bounds: BoundSignature = { nodeCount: input.boundsNodeCount };
   const discoveries = input.relations.map((relation, i): Discovery<Relation> => ({
     id: `disc-${i}-${relation.id}`,
     generatedBy: "relation.detectSharedSkeleton",
     parents: [relation.id],
     score: relation.weight,
-    bounds: input.bounds,
+    bounds,
     engineVersion: ENGINE_VERSION,
     corpusVersion: CORPUS_VERSION,
     evidence: relation,
@@ -218,7 +222,7 @@ export function reconcileDiscoveries(
 registerCapability({
   id: "discovery.wrap", label: { en: "Wrap relations as bound-relative discoveries" }, substrate: "@engine/discovery",
   operators: ["reconcileState", "summarize"],
-  input: "{relations, bounds}", output: "Discovery[]",
+  input: "{relations, boundsNodeCount}", output: "Discovery[]",
   constraints: ["EXHAUSTED is only ever valid relative to the bound signature it was computed under"],
   reversible: false, provenance: "packages/discovery", status: "KNOWN",
 });

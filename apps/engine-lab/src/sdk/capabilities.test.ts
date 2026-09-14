@@ -55,7 +55,7 @@ describe("capability: discovery.wrap + reconcileDiscoveries", () => {
   it("wraps relations as EXHAUSTED discoveries and demotes them when bounds tighten", () => {
     const { join } = runCorpusJoin({ nodes: DEFAULT_NODES });
     const { relations } = runDetectSharedSkeleton({ join });
-    const { discoveries } = runDiscoveryWrap({ relations, bounds: { nodeCount: DEFAULT_NODES.length } });
+    const { discoveries } = runDiscoveryWrap({ relations, boundsNodeCount: DEFAULT_NODES.length });
     expect(discoveries.every((d) => d.state === "EXHAUSTED")).toBe(true);
 
     const same = reconcileDiscoveries(discoveries, { nodeCount: DEFAULT_NODES.length });
