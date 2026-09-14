@@ -17,6 +17,7 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
+    "baseUrl": ".",
     "plugins": [
       {
         "name": "next"
@@ -25,7 +26,16 @@
     "paths": {
       "@/*": [
         "./*"
-      ]
+      ],
+      "@engine/corpus": ["packages/corpus/index.ts"],
+      "@engine/provenance": ["packages/provenance/index.ts"],
+      "@engine/relation": ["packages/relation/index.ts"],
+      "@engine/discovery": ["packages/discovery/index.ts"],
+      "@engine/arabic": ["packages/arabic/index.ts"],
+      "@engine/structure": ["packages/structure/index.ts"],
+      "@engine/spatial": ["packages/spatial/index.ts"],
+      "@engine/capability": ["packages/capability/index.ts"],
+      "@engine/traversal": ["packages/traversal/index.ts"]
     }
   },
   "include": [
