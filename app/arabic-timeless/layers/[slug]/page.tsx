@@ -35,7 +35,7 @@ export default async function LayerPage({
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-baseline gap-3">
-        <Link href="/layers" className="text-[11px] text-dim hover:text-mid">
+        <Link href="/arabic-timeless/layers" className="text-[11px] text-dim hover:text-mid">
           ← all layers
         </Link>
         <span className="text-[10px] uppercase tracking-widest text-dim">
@@ -101,12 +101,12 @@ export default async function LayerPage({
 
       <nav className="flex justify-between border-t border-line pt-4 text-[12px]">
         {prev ? (
-          <Link href={`/layers/${prev.slug}`} className="text-cyan hover:underline">
+          <Link href={`/arabic-timeless/layers/${prev.slug}`} className="text-cyan hover:underline">
             ← {prev.name.en}
           </Link>
         ) : <span />}
         {next ? (
-          <Link href={`/layers/${next.slug}`} className="text-cyan hover:underline">
+          <Link href={`/arabic-timeless/layers/${next.slug}`} className="text-cyan hover:underline">
             {next.name.en} →
           </Link>
         ) : <span />}

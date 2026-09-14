@@ -138,3 +138,11 @@ pre.tree {
 .mono { font-family: var(--mono); }
 
 a.link { color: var(--accent); cursor: pointer; text-decoration: underline; }
+
+.sidebar-footer {
+  margin-top: auto; padding: 14px 18px 4px; border-top: 1px solid var(--line);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.sidebar-link { color: var(--ink-2); font-size: 11px; text-decoration: none; }
+.sidebar-link:hover { color: var(--accent); }
+.sidebar-footer .tag { font-size: 10px; line-height: 1.4; }

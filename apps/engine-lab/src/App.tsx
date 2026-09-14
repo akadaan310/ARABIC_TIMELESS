@@ -23,6 +23,12 @@ export default function App() {
             {t}
           </button>
         ))}
+        <div className="sidebar-footer">
+          <a href="/arabic-timeless" className="sidebar-link">
+            Arabic Timeless →
+          </a>
+          <span className="tag">the twenty-layers app this SDK was extracted from</span>
+        </div>
       </nav>
       <main className="main">
         {tab === "Capabilities" && <CapabilitiesView capabilities={lab.capabilities} />}

@@ -311,13 +311,13 @@ export function Walkthrough() {
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Link
-            href="/live"
+            href="/arabic-timeless/live"
             className="rounded-lg border border-cyan/40 px-3 py-2 text-[12px] text-cyan transition active:bg-cyan/10"
           >
             ask a text of your own →
           </Link>
           <Link
-            href="/layers"
+            href="/arabic-timeless/layers"
             className="rounded-lg border border-line px-3 py-2 text-[12px] text-mid transition active:bg-ink-3"
           >
             the twenty layers

@@ -37,7 +37,7 @@ export default function LayersPage() {
               .map((l) => (
                 <Link
                   key={l.id}
-                  href={`/layers/${l.slug}`}
+                  href={`/arabic-timeless/layers/${l.slug}`}
                   className="group rounded-lg border border-line bg-ink-2/50 p-4 transition hover:border-gold-dim/60 hover:bg-ink-2"
                 >
                   <div className="flex items-baseline gap-2">

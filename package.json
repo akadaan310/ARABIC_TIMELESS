@@ -4,12 +4,13 @@
   "private": true,
   "description": "An engine for the twenty layers of dotless Arabic, applied to modern written Arabic.",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "node scripts/sync-engine-lab.mjs && next dev",
+    "build": "node scripts/sync-engine-lab.mjs && next build",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "sync:engine-lab": "node scripts/sync-engine-lab.mjs"
   },
   "dependencies": {
     "next": "16.3.0",
