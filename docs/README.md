@@ -22,6 +22,14 @@ the claim as not implemented.**
 | 8 | [`architecture-gaps.md`](architecture-gaps.md) | Negative space — what is absent, with the evidence for the absence. No solutions proposed |
 | 9 | [`architecture-stoppers.md`](architecture-stoppers.md) | Thirteen conditions that must **stop** a future implementation pass, plus the general guards |
 
+## Related paper
+
+[`waznomia/`](waznomia/) — a contribution to the WAZNOMIA header (a science of
+functional nomenclature determination). Appendices A and B are written from this
+engine's layers: 22 determinations, each reproducible by
+`npx vitest run lib/engine/__tests__/waznomia.determinations.test.ts`. The
+header there is not ours and is reproduced unedited.
+
 ## Reproducing everything
 
 ```
